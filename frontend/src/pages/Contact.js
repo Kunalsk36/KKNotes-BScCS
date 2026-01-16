@@ -31,11 +31,13 @@ export default function Contact() {
     
     // Simulate submission
     setTimeout(() => {
-      feedback.push({
-        id: `fb-${feedback.length + 1}`,
+      const newFeedback = {
+        id: `fb-${Date.now()}`,
         ...formData,
         timestamp: new Date().toISOString()
-      });
+      };
+      const currentFeedback = JSON.parse(localStorage.getItem('kknotes_feedback')) || feedback;
+      localStorage.setItem('kknotes_feedback', JSON.stringify([...currentFeedback, newFeedback]));
       
       toast.success('Message sent successfully! We\'ll get back to you soon.');
       

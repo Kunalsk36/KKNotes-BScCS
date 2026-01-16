@@ -5,7 +5,10 @@ import { toast } from 'sonner';
 import { feedback } from '../data';
 
 export default function AdminFeedback() {
-  const [feedbackList, setFeedbackList] = useState(feedback);
+  const [feedbackList, setFeedbackList] = useState(() => {
+    const stored = localStorage.getItem('kknotes_feedback');
+    return stored ? JSON.parse(stored) : feedback;
+  });
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredFeedback = feedbackList.filter(
@@ -22,7 +25,9 @@ export default function AdminFeedback() {
   };
 
   const handleDelete = (id) => {
-    setFeedbackList(feedbackList.filter((fb) => fb.id !== id));
+    const updatedList = feedbackList.filter((fb) => fb.id !== id);
+    setFeedbackList(updatedList);
+    localStorage.setItem('kknotes_feedback', JSON.stringify(updatedList));
     toast.success('Feedback deleted successfully');
   };
 

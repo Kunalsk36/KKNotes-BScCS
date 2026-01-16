@@ -16,6 +16,10 @@ export default function YearPage() {
   
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSemester, setActiveSemester] = useState(currentSemester);
+  const [allSubjects] = useState(() => {
+    const stored = localStorage.getItem('kknotes_subjects');
+    return stored ? JSON.parse(stored) : subjects;
+  });
 
   const handleSemesterChange = (sem) => {
     setActiveSemester(sem);
@@ -23,13 +27,18 @@ export default function YearPage() {
   };
 
   const filteredSubjects = useMemo(() => {
-    return subjects.filter(
+    let targetSemester;
+    if (year === 'FY') targetSemester = activeSemester === '1' ? 'I' : 'II';
+    else if (year === 'SY') targetSemester = activeSemester === '1' ? 'III' : 'IV';
+    else targetSemester = activeSemester === '1' ? 'V' : 'VI';
+
+    return allSubjects.filter(
       (subject) =>
         subject.year === year &&
-        subject.semester === (activeSemester === '1' ? 'I' : 'II') &&
+        subject.semester === targetSemester &&
         subject.name.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [year, activeSemester, searchQuery]);
+  }, [year, activeSemester, searchQuery, allSubjects]);
 
   const openLink = (url) => {
     window.open(url, '_blank', 'noopener,noreferrer');
@@ -63,7 +72,7 @@ export default function YearPage() {
                   : 'text-slate-600 hover:bg-blue-50'
               }`}
             >
-              Semester I
+              Semester {year === 'FY' ? 'I' : year === 'SY' ? 'III' : 'V'}
             </button>
             <button
               data-testid="semester-2-tab"
@@ -74,7 +83,7 @@ export default function YearPage() {
                   : 'text-slate-600 hover:bg-blue-50'
               }`}
             >
-              Semester II
+              Semester {year === 'FY' ? 'II' : year === 'SY' ? 'IV' : 'VI'}
             </button>
           </div>
         </div>

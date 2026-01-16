@@ -6,7 +6,12 @@ import { BookOpen, Award, Search } from 'lucide-react';
 export default function SubjectInfo() {
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredSubjects = subjects.filter((subject) =>
+  const [allSubjects] = useState(() => {
+    const stored = localStorage.getItem('kknotes_subjects');
+    return stored ? JSON.parse(stored) : subjects;
+  });
+
+  const filteredSubjects = allSubjects.filter((subject) =>
     subject.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 

@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { BookOpen, Mail, Users, Eye } from 'lucide-react';
 import { visitCount } from '../data';
 
 export const Footer = () => {
+  const [currentCount, setCurrentCount] = useState(() => {
+    const stored = localStorage.getItem('kknotes_visit_count');
+    return stored ? parseInt(stored) : visitCount;
+  });
+
+  useEffect(() => {
+    const updateCount = () => {
+      const stored = localStorage.getItem('kknotes_visit_count');
+      if (stored) {
+        setCurrentCount(parseInt(stored));
+      }
+    };
+
+    // Listen for the custom event dispatched by App.js
+    window.addEventListener('visitCountUpdated', updateCount);
+    // Listen for storage events (in case of multiple tabs)
+    window.addEventListener('storage', updateCount);
+    
+    return () => {
+      window.removeEventListener('visitCountUpdated', updateCount);
+      window.removeEventListener('storage', updateCount);
+    };
+  }, []);
+
   return (
     <footer data-testid="footer" className="bg-slate-900 text-slate-300 mt-auto">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -65,7 +89,7 @@ export const Footer = () => {
                 <Eye className="h-5 w-5" />
                 <div>
                   <div className="text-xs text-slate-400">Total Visits</div>
-                  <div data-testid="visit-counter" className="text-lg font-bold">{visitCount.toLocaleString()}</div>
+                  <div data-testid="visit-counter" className="text-lg font-bold">{currentCount.toLocaleString()}</div>
                 </div>
               </div>
             </div>

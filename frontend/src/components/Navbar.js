@@ -82,14 +82,14 @@ export const Navbar = () => {
                   data-testid="nav-sy-sem1"
                   className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-t-lg transition-colors"
                 >
-                  Semester I
+                  Semester III
                 </Link>
                 <Link
                   to="/sy?semester=2"
                   data-testid="nav-sy-sem2"
                   className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-b-lg transition-colors"
                 >
-                  Semester II
+                  Semester IV
                 </Link>
               </div>
             </div>
@@ -109,14 +109,14 @@ export const Navbar = () => {
                   data-testid="nav-ty-sem1"
                   className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-t-lg transition-colors"
                 >
-                  Semester I
+                  Semester V
                 </Link>
                 <Link
                   to="/ty?semester=2"
                   data-testid="nav-ty-sem2"
                   className="block px-4 py-3 text-slate-700 hover:bg-blue-50 hover:text-blue-600 rounded-b-lg transition-colors"
                 >
-                  Semester II
+                  Semester VI
                 </Link>
               </div>
             </div>
@@ -223,7 +223,7 @@ export const Navbar = () => {
                       className="block px-4 py-2 rounded-lg text-slate-600 hover:bg-blue-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Semester I
+                      Semester III
                     </Link>
                     <Link
                       to="/sy?semester=2"
@@ -231,7 +231,7 @@ export const Navbar = () => {
                       className="block px-4 py-2 rounded-lg text-slate-600 hover:bg-blue-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Semester II
+                      Semester IV
                     </Link>
                   </div>
                 )}
@@ -255,7 +255,7 @@ export const Navbar = () => {
                       className="block px-4 py-2 rounded-lg text-slate-600 hover:bg-blue-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Semester I
+                      Semester V
                     </Link>
                     <Link
                       to="/ty?semester=2"
@@ -263,7 +263,7 @@ export const Navbar = () => {
                       className="block px-4 py-2 rounded-lg text-slate-600 hover:bg-blue-50"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      Semester II
+                      Semester VI
                     </Link>
                   </div>
                 )}

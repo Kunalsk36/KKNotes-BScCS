@@ -1,5 +1,5 @@
-import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -13,10 +13,26 @@ import AdminOverview from './pages/AdminOverview';
 import AdminFeedback from './pages/AdminFeedback';
 import AdminSubjects from './pages/AdminSubjects';
 import './App.css';
+import { visitCount } from './data';
+
+function VisitTracker() {
+  const location = useLocation();
+
+  useEffect(() => {
+    const storedCount = localStorage.getItem('kknotes_visit_count');
+    const currentCount = storedCount ? parseInt(storedCount) : visitCount;
+    const newCount = currentCount + 1;
+    localStorage.setItem('kknotes_visit_count', newCount.toString());
+    window.dispatchEvent(new Event('visitCountUpdated'));
+  }, [location]);
+
+  return null;
+}
 
 function App() {
   return (
     <BrowserRouter>
+      <VisitTracker />
       <Toaster position="top-right" richColors />
       <Routes>
         {/* Public Routes */}

@@ -1,13 +1,40 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Users, MessageSquare, BookOpen, TrendingUp } from 'lucide-react';
-import { subjects, feedback } from '../data';
+import { subjects, feedback, visitCount } from '../data';
 
 export default function AdminOverview() {
+  const storedFeedback = localStorage.getItem('kknotes_feedback');
+  const currentFeedback = storedFeedback ? JSON.parse(storedFeedback) : feedback;
+
+  const storedSubjects = localStorage.getItem('kknotes_subjects');
+  const currentSubjects = storedSubjects ? JSON.parse(storedSubjects) : subjects;
+
+  const [visitCountState, setVisitCountState] = useState(() => {
+    const stored = localStorage.getItem('kknotes_visit_count');
+    return stored ? parseInt(stored) : visitCount;
+  });
+
+  useEffect(() => {
+    const updateCount = () => {
+      const stored = localStorage.getItem('kknotes_visit_count');
+      if (stored) setVisitCountState(parseInt(stored));
+    };
+
+    window.addEventListener('visitCountUpdated', updateCount);
+    // Also listen for storage events (cross-tab updates)
+    window.addEventListener('storage', updateCount);
+    
+    return () => {
+      window.removeEventListener('visitCountUpdated', updateCount);
+      window.removeEventListener('storage', updateCount);
+    };
+  }, []);
+
   const stats = [
     {
       label: 'Total Subjects',
-      value: subjects.length,
+      value: currentSubjects.length,
       icon: BookOpen,
       color: 'from-blue-500 to-blue-600',
       bgColor: 'bg-blue-100',
@@ -15,7 +42,7 @@ export default function AdminOverview() {
     },
     {
       label: 'Feedback Received',
-      value: feedback.length,
+      value: currentFeedback.length,
       icon: MessageSquare,
       color: 'from-cyan-500 to-cyan-600',
       bgColor: 'bg-cyan-100',
@@ -30,8 +57,8 @@ export default function AdminOverview() {
       textColor: 'text-purple-600'
     },
     {
-      label: 'Active Users',
-      value: '1,247',
+      label: 'Total Visits',
+      value: visitCountState.toLocaleString(),
       icon: Users,
       color: 'from-green-500 to-green-600',
       bgColor: 'bg-green-100',
@@ -74,7 +101,7 @@ export default function AdminOverview() {
         <div className="bg-white rounded-xl shadow-md p-6 border border-slate-200">
           <h2 className="text-xl font-bold text-slate-900 mb-4">Recent Feedback</h2>
           <div className="space-y-4">
-            {feedback.slice(0, 3).map((fb) => (
+            {currentFeedback.slice(0, 3).map((fb) => (
               <div key={fb.id} className="border-l-4 border-blue-500 pl-4 py-2">
                 <div className="font-semibold text-slate-900">{fb.name}</div>
                 <div className="text-sm text-slate-600 line-clamp-2">{fb.message}</div>
@@ -88,7 +115,7 @@ export default function AdminOverview() {
           <h2 className="text-xl font-bold text-slate-900 mb-4">Subject Distribution</h2>
           <div className="space-y-3">
             {['FY', 'SY', 'TY'].map((year) => {
-              const count = subjects.filter((s) => s.year === year).length;
+              const count = currentSubjects.filter((s) => s.year === year).length;
               return (
                 <div key={year} className="flex items-center justify-between">
                   <span className="text-slate-700 font-medium">{year === 'FY' ? 'First Year' : year === 'SY' ? 'Second Year' : 'Third Year'}</span>

@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit, Save, X } from 'lucide-react';
+import { Plus, Edit, Save, X, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { subjects } from '../data';
 
 export default function AdminSubjects() {
-  const [subjectsList, setSubjectsList] = useState(subjects);
+  const [subjectsList, setSubjectsList] = useState(() => {
+    const stored = localStorage.getItem('kknotes_subjects');
+    return stored ? JSON.parse(stored) : subjects;
+  });
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
@@ -13,14 +16,27 @@ export default function AdminSubjects() {
     year: 'FY',
     semester: 'I',
     description: '',
-    exam_details: ''
+    exam_details: '',
+    notes_url: '',
+    question_paper_url: '',
+    reference_book_url: ''
   });
 
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
+    const { name, value } = e.target;
+    if (name === 'year') {
+      const defaultSemester = value === 'FY' ? 'I' : value === 'SY' ? 'III' : 'V';
+      setFormData({
+        ...formData,
+        year: value,
+        semester: defaultSemester
+      });
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value
+      });
+    }
   };
 
   const handleAddNew = () => {
@@ -30,7 +46,10 @@ export default function AdminSubjects() {
       year: 'FY',
       semester: 'I',
       description: '',
-      exam_details: ''
+      exam_details: '',
+      notes_url: '',
+      question_paper_url: '',
+      reference_book_url: ''
     });
   };
 
@@ -41,7 +60,10 @@ export default function AdminSubjects() {
       year: subject.year,
       semester: subject.semester,
       description: subject.description,
-      exam_details: subject.exam_details
+      exam_details: subject.exam_details,
+      notes_url: subject.notes_url || '',
+      question_paper_url: subject.question_paper_url || '',
+      reference_book_url: subject.reference_book_url || ''
     });
   };
 
@@ -55,19 +77,18 @@ export default function AdminSubjects() {
       const newSubject = {
         id: `custom-${Date.now()}`,
         ...formData,
-        notes_url: 'https://drive.google.com/file/d/example/view',
-        question_paper_url: 'https://drive.google.com/file/d/example/view',
-        reference_book_url: 'https://drive.google.com/file/d/example/view'
       };
-      setSubjectsList([...subjectsList, newSubject]);
+      const updatedList = [...subjectsList, newSubject];
+      setSubjectsList(updatedList);
+      localStorage.setItem('kknotes_subjects', JSON.stringify(updatedList));
       toast.success('Subject added successfully');
       setIsAddingNew(false);
     } else {
-      setSubjectsList(
-        subjectsList.map((subject) =>
-          subject.id === editingId ? { ...subject, ...formData } : subject
-        )
+      const updatedList = subjectsList.map((subject) =>
+        subject.id === editingId ? { ...subject, ...formData } : subject
       );
+      setSubjectsList(updatedList);
+      localStorage.setItem('kknotes_subjects', JSON.stringify(updatedList));
       toast.success('Subject updated successfully');
       setEditingId(null);
     }
@@ -77,8 +98,20 @@ export default function AdminSubjects() {
       year: 'FY',
       semester: 'I',
       description: '',
-      exam_details: ''
+      exam_details: '',
+      notes_url: '',
+      question_paper_url: '',
+      reference_book_url: ''
     });
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm('Are you sure you want to delete this subject?')) {
+      const updatedList = subjectsList.filter((subject) => subject.id !== id);
+      setSubjectsList(updatedList);
+      localStorage.setItem('kknotes_subjects', JSON.stringify(updatedList));
+      toast.success('Subject deleted successfully');
+    }
   };
 
   const handleCancel = () => {
@@ -89,7 +122,10 @@ export default function AdminSubjects() {
       year: 'FY',
       semester: 'I',
       description: '',
-      exam_details: ''
+      exam_details: '',
+      notes_url: '',
+      question_paper_url: '',
+      reference_book_url: ''
     });
   };
 
@@ -160,8 +196,24 @@ export default function AdminSubjects() {
                   onChange={handleInputChange}
                   className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="I">I</option>
-                  <option value="II">II</option>
+                  {formData.year === 'FY' && (
+                    <>
+                      <option value="I">I</option>
+                      <option value="II">II</option>
+                    </>
+                  )}
+                  {formData.year === 'SY' && (
+                    <>
+                      <option value="III">III</option>
+                      <option value="IV">IV</option>
+                    </>
+                  )}
+                  {formData.year === 'TY' && (
+                    <>
+                      <option value="V">V</option>
+                      <option value="VI">VI</option>
+                    </>
+                  )}
                 </select>
               </div>
             </div>
@@ -189,6 +241,38 @@ export default function AdminSubjects() {
               className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
               placeholder="e.g., Theory: 60 Marks | Practical: 40 Marks"
             />
+          </div>
+          <div className="mb-4">
+            <label className="block text-sm font-semibold text-slate-700 mb-2">Resource URLs</label>
+            <div className="space-y-3">
+              <input
+                type="text"
+                name="notes_url"
+                data-testid="subject-notes-url"
+                value={formData.notes_url}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Notes URL"
+              />
+              <input
+                type="text"
+                name="question_paper_url"
+                data-testid="subject-qp-url"
+                value={formData.question_paper_url}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Question Paper URL"
+              />
+              <input
+                type="text"
+                name="reference_book_url"
+                data-testid="subject-ref-url"
+                value={formData.reference_book_url}
+                onChange={handleInputChange}
+                className="w-full px-4 py-2 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Reference Book URL"
+              />
+            </div>
           </div>
           <div className="flex space-x-3">
             <button
@@ -245,6 +329,15 @@ export default function AdminSubjects() {
                         title="Edit Subject"
                       >
                         <Edit className="h-4 w-4 text-blue-600" />
+                      </button>
+                      <button
+                        data-testid={`delete-subject-btn-${index}`}
+                        onClick={() => handleDelete(subject.id)}
+                        disabled={isAddingNew || editingId}
+                        className="p-2 bg-red-100 hover:bg-red-200 rounded-lg transition-colors ml-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Delete Subject"
+                      >
+                        <Trash2 className="h-4 w-4 text-red-600" />
                       </button>
                     </div>
                   </td>
